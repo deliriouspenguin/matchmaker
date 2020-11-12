@@ -1,7 +1,87 @@
+//! Implements the Deferred Acceptance - Single Tie Break algorithm
+
 use super::{Category, MatchResult, OrderedStudent, Student};
 use rand::prelude::*;
 use std::collections::HashMap;
 
+/// Match students to more than one category
+///
+/// Use this function when a single student can be placed simultaniously
+/// in more than one category
+///
+/// # Example
+///
+/// ```
+/// use matchmaker::{Category, Student};
+/// use matchmaker::da_stb::match_students_to_multiple_categories;
+/// use rand::thread_rng;
+/// use std::collections::VecDeque;
+///
+/// // Create categories
+/// let cooking = Category::new("Cooking", 10);
+/// let reading = Category::new("Reading", 10);
+/// let walking = Category::new("Walking", 5);
+///
+/// // Create student Bert
+/// // Bert wishes to be placed in category cooking or reading (in that order)
+/// let bert = Student::new(
+///     "Bert",
+///     VecDeque::from(vec![cooking.clone(), reading.clone()]),
+///     Vec::new(),
+/// );
+///
+/// // Create student Suze
+/// // Suze wishes to be placed in category cooking or reading (in that order),
+/// // but does not wish to be placed in category walking
+/// let suze = Student::new(
+///     "Suze",
+///     VecDeque::from(vec![cooking.clone(), reading.clone()]),
+///     Vec::from([walking.clone()]),
+/// );
+///
+/// let mut rng = thread_rng();
+/// let categories = Vec::from([cooking, reading, walking]);
+///
+/// let match_result = match_students_to_multiple_categories(
+///     Vec::from([bert, suze]),
+///     &categories,
+///     &mut rng);
+///
+//// println!("Students matched to categories:");
+//// println!();
+//// for category in &categories {
+////     println!("{}:", &category.name);
+////     for student in match_result
+////         .placed
+////         .get(&category.name)
+////         .unwrap_or(&Vec::new())
+////     {
+////         println!(" - {}", &student.name);
+////     }
+//// }
+////
+//// if match_result.not_placable.is_empty() {
+////     println!();
+////     println!("All students could be placed.");
+//// }
+/// ```
+///
+/// The result will be something like this:
+///
+/// ```text
+/// Students matched to categories:
+///
+/// Cooking:
+///  - Suze
+///  - Bert
+/// Reading:
+///  - Bert
+///  - Suze
+/// Walking:
+///  - Bert
+///
+/// All students could be placed.
+/// ```
 pub fn match_students_to_multiple_categories(
     mut students: Vec<Student>,
     categories: &Vec<Category>,
@@ -62,6 +142,77 @@ pub fn match_students_to_multiple_categories(
     match_result
 }
 
+/// Match students to categories
+///
+/// Use this function if each student can only be placed in one category
+///
+/// # Example
+///
+/// ```
+/// use matchmaker::da_stb::match_students;
+/// use matchmaker::{Category, Student};
+/// use rand::thread_rng;
+/// use std::collections::VecDeque;
+///
+/// // Create categories
+/// let cooking = Category::new("Cooking", 10);
+/// let reading = Category::new("Reading", 10);
+/// let walking = Category::new("Walking", 5);
+///
+/// // Create student Bert
+/// // Bert wishes to be placed in category cooking or reading (in that order)
+/// let bert = Student::new(
+///     "Bert",
+///     VecDeque::from(vec![cooking.clone(), reading.clone()]),
+///     Vec::new(),
+/// );
+///
+/// // Create student Suze
+/// // Suze wishes to be placed in category cooking or reading (in that order),
+/// // but does not wish to be placed in category walking
+/// let suze = Student::new(
+///     "Suze",
+///     VecDeque::from(vec![reading.clone(), cooking.clone()]),
+///     Vec::from([walking.clone()]),
+/// );
+///
+/// let mut rng = thread_rng();
+/// let categories = Vec::from([cooking, reading, walking]);
+///
+/// let match_result = match_students(Vec::from([bert, suze]), &categories, &mut rng);
+///
+/// println!("Students matched to categories:");
+/// println!();
+/// for category in &categories {
+///     println!("{}:", &category.name);
+///     for student in match_result
+///         .placed
+///         .get(&category.name)
+///         .unwrap_or(&Vec::new())
+///     {
+///         println!(" - {}", &student.name);
+///     }
+/// }
+///
+/// if match_result.not_placable.is_empty() {
+///     println!();
+///     println!("All students could be placed.");
+/// }
+/// ```
+///
+/// This should the following result:
+///
+/// ```text
+/// Students matched to categories:
+///
+/// Cooking:
+///  - Bert
+/// Reading:
+///  - Suze
+/// Walking:
+///
+/// All students could be placed.
+/// ```
 pub fn match_students(
     students: Vec<Student>,
     categories: &Vec<Category>,
