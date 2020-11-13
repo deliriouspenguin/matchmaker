@@ -4,6 +4,7 @@ categories = ["algorithms"]
 description = "Rust library to fairly match students to categories."
 edition = "2018"
 keywords = ["math", "matching", "da-stb"]
+license = "MPL-2.0"
 name = "matchmaker"
 readme = "README.md"
 repository = "https://github.com/deliriouspenguin/matchmaker"
